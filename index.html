@@ -1,0 +1,1072 @@
+<html>
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="shortcut icon" href="favicon.ico" type="image/x-icon"/>
+    <!-- 标题内容 -->
+    <title>主页</title>
+    <!-- 引入外部CSS包，反正也要联网，不如从CDN引入 -->
+    <link href="https://cdn.bootcdn.net/ajax/libs/mdui/1.0.1/css/mdui.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/cropperjs/1.5.9/cropper.min.css" rel="stylesheet">
+    <!-- 页面的CSS -->
+    <style>
+        * {
+            word-break: break-all;
+        }
+
+        @keyframes fadeIn {
+            0% {
+                top: 10vh;
+                opacity: 0;
+            }
+
+            16.7% {
+                top: 6.94vh;
+                opacity: 0.259;
+            }
+
+            33.3% {
+                top: 4.44vh;
+                opacity: 0.5;
+            }
+
+            50% {
+                top: 2.5vh;
+                opacity: 0.707;
+            }
+
+            66.7% {
+                top: 1.11vh;
+                opacity: 0.866;
+            }
+
+            83.3% {
+                top: 0.28vh;
+                opacity: 0.966;
+            }
+
+            100% {
+                top: 0;
+                opacity: 1;
+            }
+        }
+
+        @keyframes fadeOut {
+            0% {
+                top: 0;
+                opacity: 1;
+            }
+
+            16.7% {
+                top: 0.28vh;
+                opacity: 0.966;
+            }
+
+            33.3% {
+                top: 1.11vh;
+                opacity: 0.866;
+            }
+
+            50% {
+                top: 2.5vh;
+                opacity: 0.707;
+            }
+
+            66.7% {
+                top: 4.44vh;
+                opacity: 0.5;
+            }
+
+            83.3% {
+                top: 6.94vh;
+                opacity: 0.259;
+            }
+
+            100% {
+                top: 10vh;
+                opacity: 0;
+            }
+        }
+
+        .page {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        .page.opened {
+            animation: fadeIn .2s;
+        }
+
+        .page.closing {
+            animation: fadeOut .2s;
+        }
+
+        .mdui-select {
+            overflow: visible;
+        }
+
+        .page-main {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            overflow: auto;
+        }
+
+        .mdui-appbar ~ .page-main {
+            top: 64px;
+        }
+
+        .mdui-text-color-white .mdui-textfield-input {
+            border-color: #ffffff;
+            color: #ffffff;
+        }
+
+        .mdui-text-color-white .mdui-textfield-input:hover {
+            border-color: #ffffff;
+            box-shadow: 0 1px 0 0 rgba(255, 255, 255, .87);
+        }
+
+        #wallpaper {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        #wallpaper-demo {
+            position: relative;
+            display: block;
+            width: 100%;
+            height: 160px;
+            border-radius: 3px;
+            object-fit: cover;
+            margin: 1rem auto;
+        }
+
+        #search-bar {
+            border-radius: 28px;
+        }
+
+        #favorite-list {
+            padding: 28px 0;
+        }
+
+        #favorite-list .mdui-col {
+            padding: 1.5rem 0;
+        }
+
+        .favorite-item {
+            position: relative;
+            margin: 0 auto;
+            padding: .5rem 0;
+            text-decoration: none;
+        }
+
+        .favorite-item-icon {
+            position: relative;
+            margin: 0 auto;
+            width: 56px;
+            height: 56px;
+            border-radius: 28px;
+        }
+
+        .favorite-item-icon .mdui-card-content {
+            font-size: 24px;
+        }
+
+        .favicon {
+            display: inline;
+            width: 1em;
+            height: 1em;
+            vertical-align: middle;
+            border-radius: 3px;
+        }
+
+        .text-shadow {
+            text-shadow: .0625rem .0625rem .125rem rgba(0, 0, 0, 0.8);
+        }
+
+        .mdui-textfield {
+            padding-top: 0;
+            line-height: 1;
+        }
+
+        .mdui-textfield:not(.mdui-textfield-has-bottom) {
+            padding-bottom: 28px;
+        }
+    </style>
+</head>
+
+<body class="mdui-theme-layout-auto mdui-theme-primary-blue mdui-theme-accent-blue">
+<!-- 主页布局（非搜索框） -->
+<div id="favorites" class="page">
+    <img src="" id="wallpaper" style="display: none;">
+    <div class="mdui-appbar mdui-appbar-fixed mdui-shadow-0">
+        <div class="mdui-toolbar mdui-color-transparent mdui-text-color-white text-shadow">
+            <div class="mdui-toolbar-spacer"></div>
+            <a class="mdui-btn mdui-btn-icon" onclick="openPage('editing-favorite');"
+               mdui-tooltip="{content: '编辑收藏栏'}">
+                <i class="mdui-icon material-icons">&#xe5c3;</i>
+            </a>
+            <a class="mdui-btn mdui-btn-icon" onclick="if(themePanel != null) themePanel.open();"
+               mdui-tooltip="{content: '主题与壁纸'}">
+                <i class="mdui-icon material-icons">&#xe3b7;</i>
+            </a>
+            <a class="mdui-btn mdui-btn-icon" onclick="if(settingsPanel != null) settingsPanel.open();"
+               mdui-tooltip="{content: '设置与关于'}">
+                <i class="mdui-icon material-icons">&#xe8b8;</i>
+            </a>
+        </div>
+    </div>
+    <div class="mdui-container" style="padding-top: 30vh;">
+        <div id="search-bar" class="mdui-card" onclick="openPage('search-page');$('#search-input').focus();">
+            <div class="mdui-card-content">
+                    <span class="mdui-text-color-grey mdui-text-truncate"
+                          style="line-height: 24px; padding-left: 8px;">搜索</span>
+                <span class="mdui-float-right"><i class="mdui-icon material-icons">&#xe8b6;</i></span>
+            </div>
+        </div>
+        <div id="favorite-list" class="mdui-row-xs-4 mdui-row-md-6 mdui-row-lg-8 mdui-row-xl-12 mdui-grid-list">
+        </div>
+        <template id="favorite-item-template">
+            <div class="mdui-col">
+                <a class="favorite-item" href="{{href}}">
+                    <div class="favorite-item-icon mdui-card">
+                        <div class="mdui-card-content">
+                            {{{icon}}}
+                        </div>
+                    </div>
+                    <p class="mdui-text-color-white mdui-text-center text-shadow">
+                        {{title}}
+                    </p>
+                </a>
+            </div>
+        </template>
+    </div>
+</div>
+</div>
+<!-- 主页布局（搜索框） -->
+<div id="search-page" class="mdui-card page" style="display: none;">
+    <!-- 顶栏 -->
+    <div class="mdui-appbar mdui-color-theme">
+        <div class="mdui-toolbar mdui-text-color-white">
+            <a class="mdui-btn mdui-btn-icon" onclick="closePage('search-page');" mdui-tooltip="{content: '返回'}">
+                <i class="mdui-icon material-icons">&#xe5cb;</i>
+            </a>
+            <select id="search-engine" class="mdui-select">
+                <option value="baidu">百度</option>
+                <option value="google">谷歌</option>
+                <option value="sogou">搜狗</option>
+                <option value="bing">必应</option>
+            </select>
+            <div class="mdui-toolbar-spacer">
+                <div class="mdui-textfield" style="padding: 10px 0;">
+                    <input id="search-input" class="mdui-textfield-input" type="text" placeholder="搜索"/>
+                </div>
+            </div>
+            <a class="mdui-btn mdui-btn-icon" onclick="searchStart(-1);" mdui-tooltip="{content: '搜索'}">
+                <i class="mdui-icon material-icons">&#xe8b6;</i>
+            </a>
+        </div>
+    </div>
+    <!-- 搜索建议外部容器 -->
+    <div class="page-main">
+        <div class="mdui-container">
+            <ul id="search-suggestion-list" class="mdui-list"></ul>
+        </div>
+    </div>
+    <!-- 搜索建议单个元素模板，用于渲染数据得到页面 -->
+    <template id="search-suggestion-template">
+        <li class="search-suggestion-item mdui-list-item mdui-ripple" data-id="{{index}}"
+            onclick="searchStart(parseInt($(this).attr('data-id')));">
+            <div class="mdui-list-item-content mdui-list-item-one-line">
+                {{title}}
+            </div>
+        </li>
+    </template>
+</div>
+<!-- 收藏夹编辑栏界面 -->
+<div id="editing-favorite" class="mdui-card page" style="display: none;">
+    <!-- 顶栏 -->
+    <div class="mdui-appbar mdui-color-theme">
+        <div class="mdui-toolbar mdui-text-color-white">
+            <a class="mdui-btn mdui-btn-icon" onclick="closePage('editing-favorite');"
+               mdui-tooltip="{content: '返回'}">
+                <i class="mdui-icon material-icons">&#xe5cb;</i>
+            </a>
+            <div class="mdui-typo-title">编辑收藏栏</div>
+            <div class="mdui-toolbar-spacer"></div>
+            <a class="mdui-btn mdui-btn-icon" onclick="addFavoriteItem();" mdui-tooltip="{content: '添加项目'}">
+                <i class="mdui-icon material-icons">&#xe145;</i>
+            </a>
+        </div>
+    </div>
+    <!-- 收藏夹编辑栏外部容器 -->
+    <div class="page-main">
+        <div class="mdui-container">
+            <ul id="editing-favorite-list" class="mdui-list"></ul>
+        </div>
+    </div>
+    <!-- 收藏夹编辑栏单个元素模板，用于渲染数据得到页面 -->
+    <template id="editing-favorite-item-template">
+        <li data-id="{{index}}" class="editing-favorite-item mdui-list-item mdui-ripple">
+            <i class="mdui-list-item-icon mdui-icon material-icons handle" title="拖动排序">&#xe25d;</i>
+            <div class="mdui-list-item-content">
+                <div class="mdui-list-item-title mdui-list-item-one-line">
+                    {{{icon}}}
+                    {{title}}
+                </div>
+                <div class="mdui-list-item-text mdui-list-item-one-line">
+                    {{link}}
+                </div>
+            </div>
+            <button class="mdui-btn mdui-btn-icon"
+                    onclick="editFavoriteItem(parseInt($(this).parent().attr('data-id')));" title="点击编辑">
+                <i class="mdui-list-item-icon mdui-icon material-icons">&#xe3c9;</i>
+            </button>
+            <button class="mdui-btn mdui-btn-icon"
+                    onclick="removeFavoriteItem(parseInt($(this).parent().attr('data-id')));" title="点击删除">
+                <i class="mdui-list-item-icon mdui-icon material-icons">&#xe872;</i>
+            </button>
+        </li>
+    </template>
+</div>
+<!-- 主题与壁纸设置 -->
+<div id="theme-settings" class="mdui-dialog">
+    <div class="mdui-dialog-title">主题与壁纸设置</div>
+    <div class="mdui-dialog-content">
+        <ul class="mdui-list">
+            <li class="mdui-subheader">主题</li>
+            <label class="mdui-list-item mdui-ripple">
+                <div class="mdui-list-item-avatar" style="background-color: #c5708b;"></div>
+                <div class="mdui-list-item-content">粉色</div>
+                <div class="mdui-checkbox">
+                    <input type="checkbox" name="theme" value="pink"/>
+                    <i class="mdui-checkbox-icon"></i>
+                </div>
+            </label>
+            <label class="mdui-list-item mdui-ripple">
+                <div class="mdui-list-item-avatar" style="background-color: #f68c60;"></div>
+                <div class="mdui-list-item-content">橘色</div>
+                <div class="mdui-checkbox">
+                    <input type="checkbox" name="theme" value="orange"/>
+                    <i class="mdui-checkbox-icon"></i>
+                </div>
+            </label>
+            <label class="mdui-list-item mdui-ripple">
+                <div class="mdui-list-item-avatar" style="background-color: #869d9d;"></div>
+                <div class="mdui-list-item-content">绿色</div>
+                <div class="mdui-checkbox">
+                    <input type="checkbox" name="theme" value="green"/>
+                    <i class="mdui-checkbox-icon"></i>
+                </div>
+            </label>
+            <label class="mdui-list-item mdui-ripple">
+                <div class="mdui-list-item-avatar" style="background-color: #15559a;"></div>
+                <div class="mdui-list-item-content">蓝色</div>
+                <div class="mdui-checkbox">
+                    <input type="checkbox" name="theme" value="blue"/>
+                    <i class="mdui-checkbox-icon"></i>
+                </div>
+            </label>
+            <li class="mdui-subheader">壁纸</li>
+            <li class="mdui-list-item">
+                <div class="mdui-row" style="width: 100%; margin: 0;">
+                    <div class="mdui-col-xs-12">
+                        <img id="wallpaper-demo">
+                    </div>
+                    <div class="mdui-col-xs-6 mdui-text-center" style="margin: 1rem 0;">
+                        <button class="mdui-btn mdui-ripple" onclick="setWallpaper();">上传</button>
+                    </div>
+                    <div class="mdui-col-xs-6 mdui-text-center" style="margin: 1rem 0;">
+                        <button class="mdui-btn mdui-ripple" onclick="clearWallpaper();">清除</button>
+                    </div>
+                </div>
+            </li>
+        </ul>
+    </div>
+    <div class="mdui-dialog-actions">
+        <button class="mdui-btn mdui-ripple" onclick="if(themePanel != null) themePanel.close();">关闭</button>
+    </div>
+</div>
+<!-- 设置与关于 -->
+<div id="main-settings" class="mdui-dialog">
+    <div class="mdui-dialog-title">设置与关于</div>
+    <div class="mdui-dialog-content">
+        <ul class="mdui-list">
+            <li class="mdui-subheader">设置</li>
+            <li class="mdui-list-item mdui-ripple" onclick="downloadFavorites();">
+                <div class="mdui-list-item-content">
+                    <div class="mdui-list-item-title mdui-list-item-one-line">导出收藏夹</div>
+                    <div class="mdui-list-item-text mdui-list-item-one-line">将收藏夹中的链接和标题以JSON格式下载到本地作为备份</div>
+                </div>
+            </li>
+            <li class="mdui-list-item mdui-ripple" onclick="uploadFavorites();">
+                <div class="mdui-list-item-content">
+                    <div class="mdui-list-item-title mdui-list-item-one-line">导入收藏夹</div>
+                    <div class="mdui-list-item-text mdui-list-item-one-line">将本地备份的收藏夹（JSON格式文件）导入该页面中</div>
+                </div>
+            </li>
+            <li class="mdui-subheader">关于</li>
+            <li class="mdui-list-item">
+                <div class="mdui-list-item-content">
+                    <div class="mdui-list-item-title mdui-list-item-one-line">主页</div>
+                    <div class="mdui-list-item-text">
+                        因为自己手机的浏览器主页太不实用了（收藏夹栏就那么一小条，而且下面还全是新闻），所以试着写了这个。喜欢的话就拿去用吧。本浏览器主页所有的内容均仅存储在用户本地的浏览器中，无任何需要上传至服务器的内容，请放心使用。
+                    </div>
+                </div>
+            </li>
+            <li class="mdui-list-item">
+                <div class="mdui-list-item-content">
+                    <div class="mdui-list-item-title mdui-list-item-one-line">作者：北冥有鱼（安培利亚）</div>
+                    <div class="mdui-list-item-text">
+                        项目在
+                        <a href="https://github.com/AmperiaWang/browser_homepage">GitHub</a>
+                        和
+                        <a href="https://gitee.com/ericwang017/browserhome">Gitee</a>
+                        上都有部署，欢迎随时参观与反馈。
+                    </div>
+                </div>
+            </li>
+            <li class="mdui-list-item">
+                <div class="mdui-list-item-content">
+                    <div class="mdui-list-item-title mdui-list-item-one-line">协议：MIT License</div>
+                    <div class="mdui-list-item-text">这个主页还是有点简陋，我知道满足不了所有人的需求，但是如果你想拿我的代码去用的话，遵循开源协议即可。看不爽的话也可以随便改。
+                    </div>
+                </div>
+            </li>
+            <li class="mdui-list-item">
+                <div class="mdui-list-item-content">
+                    <div class="mdui-list-item-title mdui-list-item-one-line">所使用的Javascript库</div>
+                    <div class="mdui-list-item-text">jQuery, mdui, mustache, Sortable, cropper, FileSaver；感谢它们及它们的作者。
+                    </div>
+                </div>
+            </li>
+        </ul>
+    </div>
+    <div class="mdui-dialog-actions">
+        <button class="mdui-btn mdui-ripple" onclick="if(settingsPanel != null) settingsPanel.close();">关闭</button>
+    </div>
+</div>
+<!-- 引入外部JS包，反正也要联网，不如从CDN引入 -->
+<script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script src="https://cdn.bootcdn.net/ajax/libs/mdui/1.0.1/js/mdui.min.js"></script>
+<script src="https://cdn.bootcdn.net/ajax/libs/mustache.js/4.1.0/mustache.min.js"></script>
+<script src="https://cdn.bootcdn.net/ajax/libs/Sortable/1.13.0/Sortable.min.js"></script>
+<script src="https://cdn.bootcdn.net/ajax/libs/cropperjs/1.5.9/cropper.min.js"></script>
+<script src="https://cdn.bootcdn.net/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+<script>
+    //定义全局变量
+    var urlReg = /^(https?:\/\/)([0-9a-z.]+)(:[0-9]+)?([/0-9a-z.]+)?(\?[0-9a-z&=]+)?(#[0-9-a-z]+)?/ig,
+        editFavSortable = null,
+        config = {},
+        favorites = [],
+        searchSuggestions = [],
+        searchSuggestionTimer = null,
+        searchEngine = null,
+        themePanel = null,
+        settingsPanel = null;
+
+    //定义函数
+    //从localStorage中获取json内容
+    function getJson(key, defaultValue) {
+        defaultValue = defaultValue || null;
+        var res = localStorage.getItem(key);
+        if (typeof res == 'string') {
+            try {
+                return JSON.parse(res);
+            } catch (e) {
+                return defaultValue;
+            }
+        }
+        return defaultValue;
+    }
+
+    //设置json内容到localStorage中
+    function setJson(key, value) {
+        if (value == null)
+            localStorage.removeItem(key);
+        else
+            localStorage.setItem(key, JSON.stringify(value));
+    }
+
+    //上传文本文件，读取其中的字符串并且对读取的字符串进行操作（传入的参数为回调函数）
+    function uploadTextFile(callback) {
+        $('<input type="file">').change(function () {
+            var f = this.files[0], reader = new FileReader();
+            reader.onload = function () {
+                callback(this.result);
+            };
+            reader.readAsText(f);
+        }).click();
+    }
+
+    //传入标题和字符串内容，下载文本文件
+    function downloadTextFile(title, content) {
+        var blob = new Blob([content], {type: "text/plain;charset=utf-8"});
+        saveAs(blob, title);
+    }
+
+    //判断一个页面是否开启
+    function isPageOpening(page) {
+        var pageSelector = $('#' + page);
+        return pageSelector.length == 0 || pageSelector.hasClass('opened') || pageSelector.hasClass('closing');
+    }
+
+    //开启页面
+    function openPage(page) {
+        var pageSelector = $('#' + page);
+        if (pageSelector.length == 0 || pageSelector.hasClass('opened') || pageSelector.hasClass('closing')) return;
+        pageSelector.show().addClass('opened');
+        mdui.mutation();
+    }
+
+    //关闭页面
+    function closePage(page) {
+        var pageSelector = $('#' + page);
+        if (pageSelector.length == 0 || !pageSelector.hasClass('opened')) return;
+        pageSelector.addClass('closing').removeClass('opened');
+        setTimeout(function () {
+            pageSelector.removeClass('closing').hide();
+        }, 200);
+    }
+
+    //当需要输入一个新的链接-标题对时（可能是收藏夹，也可能是搜索引擎），弹出这个窗口。参数callback为回调函数，第一个参数是链接，第二个参数是标题
+    function formDialog(config) {
+        config = config || {};
+        var _config = {
+            inputs: [{
+                id: 'form-prompt-text',
+                type: 'text',
+                title: '请输入文本'
+            }],
+            callback: function (res) {
+                console.log(res);
+            }
+        };
+        $.extend(_config, config);
+        var dialogContent = '<div>';
+        _config['inputs'].forEach(function (v, k) {
+            switch (v['type']) {
+                case 'text':
+                    dialogContent += '<div class="mdui-textfield mdui-textfield-floating-label"><label class="mdui-textfield-label">' + v['title'] + '</label><input id="' + v['id'] + '" class="mdui-textfield-input" type="text"' + (v['pattern'] != null ? ' pattern="' + v['pattern'] + '"' : '') + (v['required'] ? ' required' : '') + '/>' + (v['errorNotice'] != null ? '<div class="mdui-textfield-error">' + v['errorNotice'] + '</div>' : '') + '</div>';
+                    break;
+            }
+        });
+        dialogContent += '</div>';
+        mdui.dialog($.extend({
+            content: dialogContent,
+            buttons: [{
+                text: '取消'
+            }, {
+                text: '确认',
+                onClick: function (inst) {
+                    var argArr = [];
+                    for (var i = 0; i < _config.inputs.length; i++) {
+                        argArr.push($('#' + _config.inputs[i]['id']).val());
+                    }
+                    _config.callback.apply(this, argArr);
+                }
+            }]
+        }, _config));
+    }
+
+    //根据收藏夹的链接获取收藏夹内容的favicon，用于显示
+    function getFavIcon(link) {
+        var favIcon = '<i class="mdui-icon material-icons">&#xe157;</i>';
+        link.replace(urlReg, function (a, b, c, d) {
+            favIcon = '<img src="' + b + c + (d || '') + '/favicon.ico" class="favicon">';
+            return a;
+        });
+        return favIcon;
+    }
+
+    //更新收藏夹的显示（主页与编辑页都更新）
+    function showFavorites() {
+        var container = $('#favorite-list'),
+            editingContainer = $('#editing-favorite-list'),
+            template = $('#favorite-item-template').html(),
+            editingTemplate = $('#editing-favorite-item-template').html(),
+            isEditingPageOpening = isPageOpening('editing-favorite');
+        container.html('');
+        if (!isEditingPageOpening) editingContainer.html('');
+        for (var i = 0; i < favorites.length; i++) {
+            var data = $.extend(true, {}, favorites[i] || {});
+            data['index'] = i;
+            data['icon'] = getFavIcon(data['link']);
+            data['href'] = data['link'];
+            container.append(Mustache.render(template, data));
+            if (!isEditingPageOpening) editingContainer.append(Mustache.render(editingTemplate, data));
+        }
+        container.append(Mustache.render(template, {
+            'index': -1,
+            'href': 'javascript:addFavoriteItem();',
+            'icon': '<i class="mdui-icon material-icons">&#xe145;</i>',
+            'title': '添加'
+        }));
+        if (isEditingPageOpening) {
+            var items = editingContainer.children();
+            for (var i = 0; i < items.length; i++) {
+                items.eq(i).attr('data-id', i);
+            }
+        } else {
+            editFavSortable = Sortable.create(editingContainer.get(0), {
+                animation: 500,
+                handle: '.handle',
+                onEnd: function (evt) {
+                    var index = editFavSortable.toArray(), temp = [];
+                    for (var i = 0; i < index.length; i++) {
+                        temp.push(favorites[parseInt(index[i])]);
+                    }
+                    favorites = temp;
+                    setJson('favorites', favorites);
+                    showFavorites();
+                },
+            });
+        }
+    }
+
+    //向收藏夹中添加内容
+    function addFavoriteItem() {
+        formDialog({
+            title: '添加新的网页',
+            inputs: [{
+                id: 'new-favorite-link',
+                type: 'text',
+                title: '链接',
+                pattern: urlReg.source,
+                required: true,
+                errorNotice: '请输入正确的URL'
+            }, {
+                id: 'new-favorite-title',
+                type: 'text',
+                title: '标题',
+                required: true,
+                errorNotice: '标题不能为空'
+            }],
+            onOpened: function (inst) {
+
+            },
+            callback: function (link, title) {
+                if (link.length <= 0 || link.match(urlReg) == null) {
+                    mdui.snackbar({
+                        message: '请输入正确的URL。'
+                    });
+                } else if (title.length <= 0) {
+                    mdui.snackbar({
+                        message: '标题不能为空。'
+                    });
+                } else {
+                    var data = {'link': link, 'title': title};
+                    favorites.push($.extend(true, {}, data));
+                    data['index'] = favorites.length - 1;
+                    data['icon'] = getFavIcon(data['link']);
+                    $('#editing-favorite-list').append(Mustache.render($('#editing-favorite-item-template').html(), data));
+                    setJson('favorites', favorites);
+                    mdui.snackbar({
+                        message: '添加成功。'
+                    });
+                    showFavorites();
+                }
+            }
+        });
+    }
+
+    //更改收藏夹中的某个内容
+    function editFavoriteItem(index) {
+        if (index < 0 || index >= favorites.length) return;
+        formDialog({
+            title: '编辑',
+            inputs: [{
+                id: 'edit-favorite-link',
+                type: 'text',
+                title: '链接',
+                pattern: urlReg.source,
+                required: true,
+                errorNotice: '请输入正确的URL'
+            }, {
+                id: 'edit-favorite-title',
+                type: 'text',
+                title: '标题',
+                required: true,
+                errorNotice: '标题不能为空'
+            }],
+            onOpened: function (inst) {
+                $('#edit-favorite-link').val(favorites[index]['link']);
+                $('#edit-favorite-title').val(favorites[index]['title']);
+                mdui.updateTextFields();
+            },
+            callback: function (link, title) {
+                if (link.length <= 0 || link.match(urlReg) == null) {
+                    mdui.snackbar({
+                        message: '请输入正确的URL。'
+                    });
+                } else if (title.length <= 0) {
+                    mdui.snackbar({
+                        message: '标题不能为空。'
+                    });
+                } else {
+                    favorites[index] = {'link': link, 'title': title};
+                    var data = $.extend(true, {}, favorites[index]),
+                        editingContainer = $('.editing-favorite-item[data-id="' + index + '"]');
+                    data['index'] = index;
+                    data['icon'] = getFavIcon(data['link']);
+                    editingContainer.after(Mustache.render($('#editing-favorite-item-template').html(), data));
+                    editingContainer.remove();
+                    setJson('favorites', favorites);
+                    mdui.snackbar({
+                        message: '修改成功。'
+                    });
+                    showFavorites();
+                }
+            }
+        });
+    }
+
+    //移除收藏夹中的内容
+    function removeFavoriteItem(index) {
+        $('.editing-favorite-item[data-id="' + index + '"]').remove();
+        favorites.splice(index, 1);
+        setJson('favorites', favorites);
+        mdui.snackbar({
+            message: '删除成功。'
+        });
+        showFavorites();
+    }
+
+    //保存收藏夹
+    function downloadFavorites() {
+        downloadTextFile('favorites_' + (new Date()).valueOf() + '.json', JSON.stringify(favorites));
+    }
+
+    //上传收藏夹（可以选择是否覆盖，如果不覆盖则为追加）
+    function uploadFavorites() {
+        if (settingsPanel != null && settingsPanel.getState() == 'opened') settingsPanel.close();
+        var replace = false, _uploadStart = function () {
+            uploadTextFile(function (res) {
+                var newFavorites = JSON.parse(res), curFavorites = [], res = [];
+                if (!Array.isArray(newFavorites)) {
+                    mdui.alert('该文件不符合规范。');
+                    return;
+                }
+                if (replace) {
+                    for (var i = 0; i < newFavorites.length; i++) {
+                        var data = $.extend(true, {}, newFavorites[i]);
+                        if (typeof data == 'object' && 'link' in data && 'title' in data) res.push({
+                            'link': data['link'],
+                            'title': data['title']
+                        });
+                    }
+                } else {
+                    for (var i = 0; i < favorites.length; i++) {
+                        var data = $.extend(true, {}, favorites[i]);
+                        if (typeof data == 'object' && 'link' in data && 'title' in data) {
+                            res.push({'link': data['link'], 'title': data['title']});
+                            curFavorites.push(data['link']);
+                        }
+                    }
+                    for (var i = 0; i < newFavorites.length; i++) {
+                        var data = $.extend(true, {}, newFavorites[i]);
+                        if (typeof data == 'object' && 'link' in data && 'title' in data && curFavorites.indexOf(data['link']) < 0) res.push({
+                            'link': data['link'],
+                            'title': data['title']
+                        });
+                    }
+                }
+                favorites = res;
+                setJson('favorites', favorites);
+                showFavorites();
+                mdui.snackbar({
+                    message: '导入收藏夹成功。'
+                });
+                if (settingsPanel != null) settingsPanel.open();
+            });
+        };
+        mdui.dialog({
+            title: '选择导入方式',
+            content: '是要将导入的收藏夹覆盖原收藏夹，还是追加在原收藏夹后方（不导入已有的网址）？',
+            buttons: [{
+                text: '覆盖',
+                onClick: function (inst) {
+                    replace = true;
+                    _uploadStart();
+                }
+            }, {
+                text: '追加',
+                onClick: function (inst) {
+                    replace = false;
+                    _uploadStart();
+                }
+            }, {
+                text: '取消',
+                onClick: function (inst) {
+                    if (settingsPanel != null) settingsPanel.open();
+                }
+            }]
+        });
+    }
+
+    //显示获取到的搜索建议
+    function showSuggestions() {
+        var container = $('#search-suggestion-list'), template = $('#search-suggestion-template').html();
+        container.html('');
+        for (var i = 0; i < searchSuggestions.length; i++) {
+            var data = $.extend(true, {}, searchSuggestions[i] || {});
+            data['index'] = i;
+            container.append(Mustache.render(template, data));
+        }
+    }
+
+    //绑定搜索建议回调函数
+    function bindSuggestion() {
+        window.baidu = {
+            sug: function (res) {
+                var temp = [], data = res.s;
+                for (var k = 0; k < data.length; k++) {
+                    temp.push({'title': data[k]});
+                }
+                searchSuggestions = temp;
+                showSuggestions();
+            }
+        };
+        window.google = {
+            ac: {
+                h: function (res) {
+                    var temp = [], data = res[1];
+                    for (var k = 0; k < data.length; k++) {
+                        temp.push({'title': data[k][0]});
+                    }
+                    searchSuggestions = temp;
+                    showSuggestions();
+                }
+            }
+        };
+        window.bing = {
+            sug: function (res) {
+                var temp = [], data = res.AS.Results[0].Suggests;
+                for (var k = 0; k < data.length; k++) {
+                    temp.push({'title': data[k].Txt});
+                }
+                searchSuggestions = temp;
+                showSuggestions();
+            }
+        };
+        window.sogou = {
+            sug: function (res) {
+                var temp = [], data = res[1];
+                for (var k = 0; k < data.length; k++) {
+                    temp.push({'title': data[k]});
+                }
+                searchSuggestions = temp;
+                showSuggestions();
+            }
+        };
+        $('#search-input').on('input propertychange', function () {
+            getSuggestions();
+        }).on('keydown', function (e) {
+            var keyCode = e.keyCode || 0;
+            if (keyCode == 13) searchStart(-1);
+        });
+    }
+
+    //获取搜索建议
+    function getSuggestions() {
+        var engine = $('#search-engine').val(), val = $('#search-input').val();
+        if (searchSuggestionTimer != null) {
+            clearTimeout(searchSuggestionTimer);
+            searchSuggestionTimer = null;
+        }
+        if (!val || !val.trim().length) {
+            searchSuggestions = [];
+            showSuggestions();
+            return;
+        }
+        searchSuggestionTimer = setTimeout(function () {
+            switch (engine) {
+                case 'baidu':
+                    $.getScript('http://suggestion.baidu.com/su?wd=' + encodeURIComponent(val.trim()) + '&cb=window.baidu.sug');
+                    break;
+                case 'google':
+                    $.getScript('http://suggestqueries.google.com/complete/search?client=youtube&q=' + encodeURIComponent(val.trim()) + '&jsonp=window.google.ac.h');
+                    break;
+                case 'sogou':
+                    $.getScript('https://www.sogou.com/suggnew/ajajjson?type=web&key=' + encodeURIComponent(val.trim()));
+                    break;
+                case 'bing':
+                    $.getScript('http://api.bing.com/qsonhs.aspx?type=cb&q=' + encodeURIComponent(val.trim()) + '&cb=window.bing.sug');
+                    break;
+            }
+        }, 1000);
+    }
+
+    //开始搜索
+    function searchStart(index) {
+        var engine = $('#search-engine').val(), val = $('#search-input').val();
+        if (index >= 0 && index < searchSuggestions.length) val = searchSuggestions[index]['title'];
+        val = encodeURIComponent(val.trim());
+        switch (engine) {
+            case 'baidu':
+                window.location = val && val.length ? 'https://www.baidu.com/#wd=' + val : 'https://www.baidu.com';
+                break;
+            case 'google':
+                window.location = val && val.length ? 'https://www.google.com/search?q=' + val : 'https://www.google.com';
+                break;
+            case 'sogou':
+                window.location = val && val.length ? 'https://www.sogou.com/web?query=' + val : 'https://www.sogou.com';
+                break;
+            case 'bing':
+                window.location = val && val.length ? 'https://bing.com/search?q=' + val : 'https://bing.com';
+                break;
+        }
+    }
+
+    //应用主题色
+    function applyTheme(color) {
+        var availableColors = ['pink', 'orange', 'green', 'blue'];
+        if (availableColors.indexOf(color) < 0) return;
+        var wallpaperDict = {
+            'pink': '#c5708b',
+            'orange': '#f68c60',
+            'green': '#869d9d',
+            'blue': '#15559a'
+        };
+        availableColors.forEach(function (v, k) {
+            $('body').removeClass('mdui-theme-primary-' + v).removeClass('mdui-theme-accent-' + v);
+        });
+        $('body').addClass('mdui-theme-primary-' + color).addClass('mdui-theme-accent-' + color);
+        $('#favorites').css('background-color', wallpaperDict[color]);
+        $('input[name="theme"]').each(function () {
+            var val = $(this).val(), isSelected = $(this).prop('checked') || false;
+            if (val == color && !isSelected) $(this).prop('checked', true);
+            if (val != color && isSelected) $(this).prop('checked', false);
+        });
+        config['theme'] = color;
+        setJson('config', config);
+        mdui.mutation();
+    }
+
+    //根据源内容显示壁纸
+    function showWallpaper(src) {
+        var container = $('#wallpaper'), settingsContainer = $('#wallpaper-demo');
+        if (typeof src == 'string' && src.length > 0) {
+            container.attr('src', src).show();
+            settingsContainer.attr('src', src);
+        } else {
+            container.attr('src', '').hide();
+            settingsContainer.attr('src', '');
+        }
+    }
+
+    //设置壁纸
+    function setWallpaper() {
+        $('<input type="file" accept="image/*">').change(function () {
+            var f = this.files[0], reader = new FileReader(), cropper = null;
+            reader.onload = function (e) {
+                var imageSrc = this.result, image = new Image();
+                image.onload = function () {
+                    themePanel.close();
+                    mdui.dialog({
+                        title: '裁剪图像',
+                        content: '<div style="position:relative;height:60vh;"><canvas id="image-crop" style="position:relative;max-width:80%;max-height:80%;margin:0 auto;"></canvas></div>',
+                        onOpened: function (inst) {
+                            var canvas = $(inst.$element[0]).find('#image-crop').get(0), ctx = canvas.getContext("2d");
+                            canvas.width = image.width;
+                            canvas.height = image.height;
+                            ctx.drawImage(image, 0, 0, image.width, image.height);
+                            cropper = new Cropper(canvas, {
+                                viewMode: 2,
+                                ready: function () {
+                                    var cropper = this.cropper, containerData = cropper.getImageData();
+                                    cropper.setCropBoxData({
+                                        left: 0,
+                                        top: 0,
+                                        width: containerData.width,
+                                        height: containerData.height
+                                    });
+                                }
+                            });
+                        },
+                        buttons: [{
+                            text: '取消',
+                            onclick: function (inst) {
+                                themePanel.open();
+                            }
+                        }, {
+                            text: '确认',
+                            onClick: function (inst) {
+                                var boxData = cropper.getCropBoxData(), resolution = 1.5,
+                                    aspectRatio = Math.max(boxData.width, 1) / Math.max(boxData.height, 1),
+                                    maxWidth = Math.floor(Math.max($(window).width(), $(window).height() * aspectRatio) * resolution),
+                                    maxHeight = Math.floor(Math.max($(window).height(), $(window).width() / aspectRatio) * resolution),
+                                    threshold = 2073600, sizeRatio = maxWidth * maxHeight / threshold; //1920*1080
+                                if (sizeRatio > 1) {
+                                    maxWidth = Math.floor(maxWidth / sizeRatio);
+                                    maxHeight = Math.floor(maxHeight / sizeRatio);
+                                }
+                                var cropped = cropper.getCroppedCanvas({maxWidth: maxWidth, maxHeight: maxHeight});
+                                var imageBase64 = cropped.toDataURL('image/jpeg');
+                                config['wallpaper'] = imageBase64;
+                                setJson('config', config);
+                                mdui.snackbar('壁纸设置成功。');
+                                showWallpaper(imageBase64);
+                            }
+                        }]
+                    });
+                };
+                image.src = imageSrc;
+            };
+            reader.readAsDataURL(f);
+        }).click();
+    }
+
+    //清空壁纸
+    function clearWallpaper() {
+        delete config['wallpaper'];
+        setJson('config', config);
+        mdui.snackbar('壁纸清空成功。');
+        showWallpaper('');
+    }
+
+    //初始化
+    $(function () {
+        themePanel = new mdui.Dialog('#theme-settings');
+        settingsPanel = new mdui.Dialog('#main-settings');
+        config = getJson('config', {});
+        applyTheme(config['theme'] || 'blue');
+        $('input[name="theme"]').on('change', function () {
+            var isChecked = false;
+            $('input[name="theme"]').each(function () {
+                isChecked = isChecked || $(this).prop('checked');
+            });
+            if (!isChecked) $(this).prop('checked', true);
+            applyTheme($(this).val());
+        });
+        if (typeof config['wallpaper'] == 'string') showWallpaper(config['wallpaper']);
+        if (typeof config['engine'] == 'string' && ['baidu', 'google', 'sogou', 'bing'].indexOf(config['engine']) >= 0) {
+            $('#search-engine').val(config['engine']);
+        }
+        searchEngine = new mdui.Select('#search-engine');
+        $('#search-engine').change(function () {
+            var engine = $(this).val();
+            config['engine'] = engine;
+            setJson('config', config);
+        });
+        favorites = getJson('favorites', [{
+            'link': 'https://www.baidu.com',
+            'title': '百度'
+        }, {'link': 'https://www.bilibili.com', 'title': '哔哩哔哩'}]);
+        showFavorites();
+        bindSuggestion();
+    });
+</script>
+</body>
+
+</html>
